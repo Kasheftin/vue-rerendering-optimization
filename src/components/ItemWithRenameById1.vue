@@ -2,7 +2,7 @@
   <div v-if="item" class="rr-item">
     <div class="rr-item__check">
       <input
-        :input-value="item.isChecked"
+        :checked="item.isChecked"
         type="checkbox"
         @change="$emit('set-checked', $event.target.checked)"
       >
