@@ -11,6 +11,17 @@
         @set-checked="setCheckedItemById({ id: item.id, isChecked: $event })"
       />
     </draggable>
+    <p>
+      <strong>
+        Logs:
+      </strong>
+      <button @click="logs = []">
+        Clear Logs
+      </button>
+    </p>
+    <div v-for="log in logs" :key="log.id">
+      {{ log.time }} - {{ log.text }}
+    </div>
   </div>
 </template>
 
@@ -22,6 +33,11 @@ export default {
   components: {
     draggable,
     Item
+  },
+  data () {
+    return {
+      logs: []
+    }
   },
   computed: {
     items () {
@@ -36,10 +52,10 @@ export default {
   },
   watch: {
     itemIds () {
-      console.log('itemIds object watcher run: saving new item order: ', this.itemIds)
+      this.log(`itemIds object-type watcher run for ${this.itemIds.join(', ')}`)
     },
     itemIdsTrigger () {
-      console.log('itemIdsTrigger primitive type watcher run: saving new item order', this.itemIds)
+      this.log(`itemIdsTrigger string-type watcher run for ${this.itemIds.join(', ')}`)
     }
   },
   created () {
@@ -53,6 +69,13 @@ export default {
     },
     setCheckedItemById ({ id, isChecked }) {
       this.$store.commit('example1/setCheckedItemById', { id, isChecked })
+    },
+    log (text) {
+      this.logs.push({
+        id: this.logs.length,
+        time: (new Date()).toLocaleTimeString(),
+        text
+      })
     }
   }
 }
