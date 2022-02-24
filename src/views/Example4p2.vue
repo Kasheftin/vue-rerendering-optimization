@@ -3,6 +3,9 @@
     <div>
       <button @click="addItems">Add 10 items</button>
       <button @click="reset">Reset store</button>
+      <button v-if="checkedIds.length" @click="deleteCheckedItems">
+        Delete {{ checkedIds.length }} checked item{{ checkedIds.length === 1 ? '' : 's' }}
+      </button>
     </div>
     <draggable
       :value="ids"
@@ -12,8 +15,12 @@
         v-for="id in ids"
         :key="id"
         :item-id="id"
+        :class="{
+          'rr-item--highlight': highlightedItems[id] && (highlightedItems[id] + 1000 > currentTime)
+        }"
         @set-checked="setCheckedItemById({ id, isChecked: $event })"
         @rename="renameItem({ id, title: $event })"
+        @updated="highlightItem(id)"
       />
     </draggable>
   </div>
@@ -30,8 +37,23 @@ export default {
     draggable,
     ItemWithRenameById2
   },
+  data () {
+    return {
+      highlightedItems: {},
+      currentTime: (new Date()).getTime()
+    }
+  },
   computed: {
-    ...mapState('example4', ['ids'])
+    ...mapState('example4', ['ids', 'checkedIds'])
+  },
+  mounted () {
+    this._interval = setInterval(() => {
+      this.currentTime = (new Date()).getTime()
+    }, 100)
+  },
+  beforeDestroy () {
+    this.reset()
+    this._interval && clearInterval(this._interval)
   },
   methods: {
     updateItemsOrder (event) {
@@ -51,6 +73,9 @@ export default {
     reset () {
       this.$store.commit('example4/reset')
     },
+    deleteCheckedItems () {
+      this.$store.commit('example4/deleteCheckedItems')
+    },
     createHeavyItem (it, childrenCount = 10) {
       const id = uniqid()
       return {
@@ -58,6 +83,12 @@ export default {
         title: `Item ${id}`,
         hashes: Array(10).fill('Lorem ipsum dolor sit amet.'),
         children: it ? Array(childrenCount).fill().map(() => this.createHeavyItem(it - 1, childrenCount)) : []
+      }
+    },
+    highlightItem (id) {
+      this.highlightedItems = {
+        ...this.highlightedItems,
+        [id]: (new Date()).getTime()
       }
     }
   }

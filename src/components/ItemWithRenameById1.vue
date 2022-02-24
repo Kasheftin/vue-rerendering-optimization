@@ -30,7 +30,8 @@ export default {
     }
   },
   updated () {
-    console.count('ItemWithRenameById1 updated')
+    console.log('ItemWithRenameById1')
+    this.$emit('updated')
   }
 }
 </script>

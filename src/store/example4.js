@@ -17,7 +17,7 @@ export const getters = {
       isChecked: !!getters.checkedIdsRev[id]
     }))
   },
-  extendedItemsByIds (state, getters) {
+  extendedItemsByIds (_, getters) {
     return getters.extendedItems.reduce((out, extendedItem) => {
       out[extendedItem.id] = extendedItem
       return out
@@ -26,9 +26,15 @@ export const getters = {
   extendedItemsNested (state, getters) {
     return state.ids.map(id => ({
       id,
-      item: state.itemsByIds[id],
+      data: state.itemsByIds[id],
       isChecked: !!getters.checkedIdsRev[id]
     }))
+  },
+  extendedItemsByIdsNested (_, getters) {
+    return getters.extendedItemsNested.reduce((out, extendedItem) => {
+      out[extendedItem.id] = extendedItem
+      return out
+    }, {})
   }
 }
 
@@ -69,5 +75,13 @@ export const mutations = {
     } else if (!isChecked && index !== -1) {
       state.checkedIds.splice(index, 1)
     }
+  },
+  deleteCheckedItems (state) {
+    state.ids = state.ids.filter(id => !state.checkedIds.includes(id))
+    state.itemsByIds = state.ids.reduce((out, id) => {
+      out[id] = state.itemsByIds[id]
+      return out
+    }, {})
+    state.checkedIds = []
   }
 }

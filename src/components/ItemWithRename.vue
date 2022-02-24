@@ -29,7 +29,8 @@ export default {
     }
   },
   updated () {
-    console.count('ItemWithRenameById updated')
+    console.log('ItemWithRename')
+    this.$emit('updated')
   }
 }
 </script>
